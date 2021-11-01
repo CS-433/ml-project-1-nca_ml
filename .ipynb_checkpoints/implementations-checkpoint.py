@@ -2,7 +2,27 @@
 import numpy as np
 from proj1_helpers import *
 
-'''Small helper functions====================================================='''
+'''Table of content:
+Section 1 [l.25 to l.45] : Small helper functions for mandatory functions
+Section 2 [l.57 to l.120] : Mandatory functions
+Section 3 [l.122 to end] : Feature engineering functions
+                   -decorrelate_features
+                   -delete_zero_var_features
+                   -delete_outliers
+                   -add_offset
+                   -standardize
+                   -divide_in_groups
+                   -polynomial_embedding
+                   -cross_validation
+                   -build_k_indices
+                   -cross_validation_demo
+                   -split_data
+                   -bias_variance_demo
+                   -cross_validation_deg_lambda
+                   -cross_validation_bis
+'''
+
+'''Small helper functions for mandatory functions==========================================='''
 #Loss function (MSE)
 def MSE_loss(y, tx, w):
     x=y-tx.dot(w)
@@ -24,16 +44,17 @@ def log_loss(y, tx, w):
     loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
     return np.squeeze(- loss)
 
-#delete outliers and unusable datapoints
-def delete(tx,a):
-    j = 0
-    for i in range(tx.shape[0]):
-        if a in tx[i-j,:]:
-            tx = np.delete(tx,i-j,0)
-            j = j+1
-    return tx
+#Stochastic gradient descent
+def SGD(y, tx, w):
+    my=None
+    mx=None
+    for mmini_y,mini_x in batch_iter(y, tx, batch_size=1):
+            my=mmini_y
+            mx=mini_x
+    
+    return Grad(my, mx, w)
 
-''' Mandatory functions========================================================'''
+'''Mandatory functions=================================================================='''
 #Least squares regression thanks to normal equations
 def least_squares(y, tx):
     weight = np.linalg.solve(tx.T@tx,tx.T@y)
@@ -53,6 +74,15 @@ def least_squares_GD(y, tx, initial_w,max_iters, gamma):
     loss=MSE_loss(y,tx,weight)
     return weight,loss
 
+#Least square using SGD
+def least_squares_SGD(y, tx, initial_w, batch_size, max_iters, gamma):
+    weight=initial_w
+    for i in range(max_iters):
+        grd=gamma*SGD(y,tx,weight)
+        weight=weight-grd
+    loss=MSE_loss(y,tx,weight)
+    
+    return weight, loss
 #Ridge regression
 def ridge_regression(y, tx, lambda_):
     weight = np.linalg.solve(tx.T@tx + lambda_*np.eye(tx.shape[1]),tx.T@y)

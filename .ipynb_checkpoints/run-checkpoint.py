@@ -1,7 +1,5 @@
 from implementations import *
-from proj1_helpers import load_csv_data
-from implementations import *
-from proj1_helpers import predict_labels, create_csv_submission
+from proj1_helpers import *
 seed = 1
 
 y, x, ids = load_csv_data("project1/data/train.csv")
@@ -57,6 +55,9 @@ w13,loss13 = ridge_regression(y[ids[5]],usable_tx13,lambda13)
 y_test, x_test, ids_init = load_csv_data("project1/data/test.csv")
 
 # Dividing the test set into groups with the same variables defined :
+tx_test, ids = divide_in_groups(x_test)
+
+# Add offset
 usable_tx01_test = add_offset(polynomial_embedding(tx_test[0][:,0:tx_test[0].shape[1]-2],degrees01))
 usable_tx11_test = add_offset(polynomial_embedding(tx_test[1],degrees11))
 usable_tx02_test = add_offset(polynomial_embedding(tx_test[2],degrees02))
